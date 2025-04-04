@@ -40,7 +40,7 @@ app.whenReady().then(() => {
     }
   ]);
 
-  Menu.setApplicationMenu(menu); // 👈 This displays the menu bar
+  Menu.setApplicationMenu(menu);
 
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
