@@ -1,0 +1,10 @@
+@font-face {
+    font-family: "Aeonik";
+    src: url("/public/AeonikProTRIAL-Regular.otf") format("opentype");
+    font-weight: normal;
+    font-style: normal;
+  }
+  body {
+    font-family: "aeonik", sans-serif;
+  }
+  

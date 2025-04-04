@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardFooter } from "../components/ui/card";
-import { Sun, Moon, Pencil, Menu, X, Save, Trash2, Book, FileText, Search, Plus, Hash, Clock, Settings, Folder, PlusCircle, Star, Archive, ChevronRight, ChevronDown } from "lucide-react";
+import { Menu, Save, Trash2, Book, FileText, Search, Plus, Clock, Folder } from "lucide-react";
 import { Textarea } from "../components/ui/textarea";
+import { useSelector } from "react-redux";
 
 
 interface Notes{
@@ -15,9 +16,8 @@ interface Notes{
         folder: string,
         tags: []
 }
-type SectionKey = "favorites" | "folders" | "tags";
 export default function ObsidianNotesApp() {
-  const [darkMode, setDarkMode] = useState(true); // Default to dark mode like Obsidian
+  const darkMode = useSelector((state: any) => state.darkMode.value);// Default to dark mode like Obsidian
   const [notes, setNotes] = useState<Notes[]>([]);
   const [search, setSearch] = useState("");
   const [newNote, setNewNote] = useState("");
@@ -25,16 +25,24 @@ export default function ObsidianNotesApp() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentView, setCurrentView] = useState("notes");
   const [editingNote, setEditingNote] = useState<Notes>();
-  const [expandedSections, setExpandedSections] = useState<Record<SectionKey, boolean>>({
-    favorites: true,
-    folders: true,
-    tags: false,
-  });
 
-  // Generate some sample folders for the sidebar
-  const folders = ["Daily Notes", "Projects", "Work", "Personal", "Archive"];
-  const tags = ["#important", "#todo", "#ideas", "#reference", "#journal"];
-
+  const obsidianColors = {
+    background: darkMode ? "#212121" : "#f8f8f8",
+    sidebar: darkMode ? "#252525" : "#f0f0f0",
+    card: darkMode ? "#2d2d2d" : "#ffffff",
+    accent: darkMode ? "#8c78c9" : "#6A9C89",
+    text: darkMode ? "#dddddd" : "#333333",
+    textSecondary: darkMode ? "#888888" : "#666666",
+    border: darkMode ? "#333333" : "#e0e0e0",
+    hoverBg: darkMode ? "#363636" : "#f5f5f5",
+    activeBg: darkMode ? "#454545" : "#e6e6e6",
+    inputBg: darkMode ? "#3a3a3a" : "#ffffff",
+    sidebarText: darkMode ? "#bbbbbb" : "#444444",
+    sidebarIcon: darkMode ? "#888888" : "#666666",
+    purple: "#8c78c9",
+    green: "#6A9C89",
+    favoriteIcon: "#e6b450",
+  };
   // Load notes from localStorage on component mount
   useEffect(() => {
     const savedNotes = localStorage.getItem("obsidian_notes");
@@ -48,14 +56,7 @@ export default function ObsidianNotesApp() {
     localStorage.setItem("obsidian_notes", JSON.stringify(notes));
   }, []);
 
-  const toggleDarkMode = () => setDarkMode(!darkMode);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-  const toggleSection = (section: SectionKey) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
 
   const addNote = () => {
     if (newNote.trim()) {
@@ -134,175 +135,9 @@ export default function ObsidianNotesApp() {
     : filterNotesByType("blog");
 
   // Obsidian-inspired colors
-  const obsidianColors = {
-    background: darkMode ? "#1e1e1e" : "#f8f8f8",
-    sidebar: darkMode ? "#252525" : "#f0f0f0",
-    card: darkMode ? "#2d2d2d" : "#ffffff",
-    accent: darkMode ? "#8c78c9" : "#6A9C89",
-    text: darkMode ? "#dddddd" : "#333333",
-    textSecondary: darkMode ? "#888888" : "#666666",
-    border: darkMode ? "#333333" : "#e0e0e0",
-    hoverBg: darkMode ? "#363636" : "#f5f5f5",
-    activeBg: darkMode ? "#454545" : "#e6e6e6",
-    inputBg: darkMode ? "#3a3a3a" : "#ffffff",
-    sidebarText: darkMode ? "#bbbbbb" : "#444444",
-    sidebarIcon: darkMode ? "#888888" : "#666666",
-    purple: "#8c78c9",
-    green: "#6A9C89",
-    favoriteIcon: "#e6b450"
-  };
+
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: obsidianColors.background, color: obsidianColors.text }}>
-      {/* Sidebar */}
-      <div 
-        className={`fixed lg:relative h-full z-10 transition-all duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 border-r`}
-        style={{ 
-          backgroundColor: obsidianColors.sidebar,
-          width: sidebarOpen ? '250px' : '0',
-          minWidth: sidebarOpen ? '250px' : '0',
-          borderColor: obsidianColors.border
-        }}
-      >
-        <div className="flex flex-col h-full overflow-y-auto">
-          <div className="flex justify-between items-center p-4 border-b" style={{ borderColor: obsidianColors.border }}>
-            <h1 className="text-lg font-medium" style={{ color: obsidianColors.text }}>Obsidian Notes</h1>
-            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="lg:hidden" style={{ color: obsidianColors.text }}>
-              <X size={18} />
-            </Button>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto">
-            {/* Search in sidebar */}
-            <div className="p-2">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4" style={{ color: obsidianColors.sidebarIcon }} />
-                <Input 
-                  placeholder="Search..." 
-                  className="pl-8 h-8 text-sm"
-                  style={{ 
-                    backgroundColor: obsidianColors.inputBg,
-                    borderColor: obsidianColors.border,
-                    color: obsidianColors.text
-                  }}
-                />
-              </div>
-            </div>
-            
-            {/* Favorites Section */}
-            <div className="px-2 py-1">
-              <div 
-                className="flex items-center gap-1 p-1 rounded cursor-pointer" 
-                onClick={() => toggleSection("favorites")}
-                style={{ color: obsidianColors.sidebarText }}
-              >
-                {expandedSections.favorites ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                <span className="text-sm font-medium">Favorites</span>
-              </div>
-              
-              {expandedSections.favorites && (
-                <div className="ml-4">
-                  {["Daily journal", "Project ideas", "Reading list"].map((item, i) => (
-                    <div 
-                      key={i} 
-                      className="flex items-center gap-2 p-1 rounded text-sm cursor-pointer hover:bg-opacity-30"
-                      style={{ 
-                        color: obsidianColors.sidebarText,
-                        backgroundColor: i === 0 ? obsidianColors.activeBg : "transparent"
-                      }}
-                    >
-                      <Star size={14} style={{ color: obsidianColors.favoriteIcon }} />
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            {/* Folders Section */}
-            <div className="px-2 py-1">
-              <div 
-                className="flex items-center gap-1 p-1 rounded cursor-pointer" 
-                onClick={() => toggleSection("folders")}
-                style={{ color: obsidianColors.sidebarText }}
-              >
-                {expandedSections.folders ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                <span className="text-sm font-medium">Folders</span>
-              </div>
-              
-              {expandedSections.folders && (
-                <div className="ml-4">
-                  {folders.map((folder, i) => (
-                    <div 
-                      key={i} 
-                      className={`flex items-center gap-2 p-1 rounded text-sm cursor-pointer hover:bg-opacity-30 ${i === 0 ? "bg-[obsidianColors.activeBg]" : "bg-transparent"}
-    hover:bg-[obsidianColors.hoverBg] text-[obsidianColors.sidebarText]`}
-                      style={{ 
-                        color: obsidianColors.sidebarText,
-                        backgroundColor: i === 0 ? obsidianColors.activeBg : "transparent",
-                      }}
-                    >
-                      <Folder size={14} style={{ color: obsidianColors.sidebarIcon }} />
-                      {folder}
-                    </div>
-                  ))}
-                  <div className="flex items-center gap-2 p-1 rounded text-sm cursor-pointer" style={{ color: obsidianColors.sidebarText }}>
-                    <PlusCircle size={14} style={{ color: obsidianColors.sidebarIcon }} />
-                    New folder
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Tags Section */}
-            <div className="px-2 py-1">
-              <div 
-                className="flex items-center gap-1 p-1 rounded cursor-pointer" 
-                onClick={() => toggleSection("tags")}
-                style={{ color: obsidianColors.sidebarText }}
-              >
-                {expandedSections.tags ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                <span className="text-sm font-medium">Tags</span>
-              </div>
-              
-              {expandedSections.tags && (
-                <div className="ml-4">
-                  {tags.map((tag, i) => (
-                    <div 
-                      key={i} 
-                      className="flex items-center gap-2 p-1 rounded text-sm cursor-pointer"
-                      style={{ color: obsidianColors.sidebarText }}
-                    >
-                      <Hash size={14} style={{ color: obsidianColors.sidebarIcon }} />
-                      {tag.substring(1)}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <div className="mt-auto p-2 border-t flex items-center justify-between" style={{ borderColor: obsidianColors.border }}>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={toggleDarkMode}
-              style={{ color: obsidianColors.sidebarText }}
-            >
-              {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              style={{ color: obsidianColors.sidebarText }}
-            >
-              <Settings size={16} />
-            </Button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
         {/* Top Bar */}
         <div className="flex justify-between items-center p-2 border-b" style={{ borderColor: obsidianColors.border }}>
@@ -490,6 +325,5 @@ export default function ObsidianNotesApp() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

@@ -2,6 +2,12 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@font-face {
+  font-family: "aeonik";
+  src: url("/AeonikProTRIAL-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}
 
 :root {
   --radius: 0.625rem;
