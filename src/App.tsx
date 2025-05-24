@@ -7,6 +7,7 @@ import Profile from './Pages/Profile.tsx';
 import { useSelector } from 'react-redux';
 import { Sidebar } from './Pages/Sidebar.tsx';
 import AdminAuth from './Pages/AdminAuth.tsx';
+import Editor from './Pages/Editor.tsx';
 function App() {
   const darkMode = useSelector((state: any) => state.darkMode.value);
   const obsidianColors = {
@@ -39,6 +40,7 @@ function App() {
       }
     >
       <Route path="/dashboard" element={<Home />} />
+      <Route path="/editor" element={<Editor />} />
       <Route path="/folder" element={<Folder />} />
     </Route>
 
