@@ -1,10 +1,12 @@
-import { Routes,BrowserRouter,Route } from 'react-router-dom'
+import { Routes,Route, Outlet } from 'react-router-dom'
 import Home from './Pages/Home.tsx';
 import './App.css'
 import { RecoilRoot } from 'recoil';
 import Folder from './Pages/Folder.tsx'
+import Profile from './Pages/Profile.tsx';
 import { useSelector } from 'react-redux';
 import { Sidebar } from './Pages/Sidebar.tsx';
+import AdminAuth from './Pages/AdminAuth.tsx';
 function App() {
   const darkMode = useSelector((state: any) => state.darkMode.value);
   const obsidianColors = {
@@ -25,16 +27,27 @@ function App() {
     favoriteIcon: "#e6b450",
   };
   return (
-  <RecoilRoot>
-   <div className="flex h-screen overflow-hidden" style={{ backgroundColor: obsidianColors.background, color: obsidianColors.text }}>
-    <Sidebar/>
-  <BrowserRouter>
+<RecoilRoot>
   <Routes>
-    <Route path='/' element={<Home/>}/>
-    <Route path='/folder' element={<Folder/>}/>
+    {/* Routes that include the Sidebar */}
+    <Route
+      element={
+        <div className="flex h-screen overflow-hidden" style={{ backgroundColor: obsidianColors.background, color: obsidianColors.text }}>
+          <Sidebar />
+          <Outlet />
+        </div>
+      }
+    >
+      <Route path="/dashboard" element={<Home />} />
+      <Route path="/folder" element={<Folder />} />
+    </Route>
+
+    {/* Route without the Sidebar */}
+    <Route path="/" element={<Profile />} />
+    <Route path="/admin" element={<AdminAuth />} />
   </Routes>
-  </BrowserRouter>
-  </div></RecoilRoot>)
+</RecoilRoot>
+)
 }
 
 export default App

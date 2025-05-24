@@ -4,7 +4,20 @@
     font-weight: normal;
     font-style: normal;
   }
+html {
+  scroll-behavior: smooth;
+}
   body {
     font-family: "aeonik", sans-serif;
   }
-  
+  .swiper {
+  padding: 2rem 0;
+}
+
+.swiper-slide {
+  transition: transform 0.3s ease;
+}
+
+.swiper-slide:hover {
+  transform: translateY(-5px);
+}

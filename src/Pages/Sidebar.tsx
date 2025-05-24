@@ -3,7 +3,8 @@ import { Input } from "../components/ui/input";
 import { ChevronDown, ChevronRight, Folder, Hash, Moon, PlusCircle, Search, Settings, Star, Sun, X } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
-import { toogleDarkMode } from '../Atoms/darkModeSlice'
+import { toogleDarkMode } from '../Atoms/darkModeSlice';
+import { useNavigate } from "react-router-dom";
 
 // redux/store.ts or types.ts
 
@@ -13,6 +14,7 @@ export interface State {
   
 type SectionKey = "favorites" | "folders" | "tags";
 export function Sidebar() {
+  const navigate= useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dispatch = useDispatch();
   const darkMode = useSelector((state: any) => state.darkMode.value);
@@ -155,7 +157,7 @@ export function Sidebar() {
               ) : (
                 <ChevronRight size={16} />
               )}
-              <span className="text-sm font-medium">Folders</span>
+              <span role="button" onClick={()=>navigate('/folder')} className="text-sm font-medium">Folders</span>
             </div>
 
             {expandedSections.folders && (
