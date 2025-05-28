@@ -6,8 +6,8 @@ import articleRoutes from './controller/articleController.js';
 import userRoutes from './controller/userController.js';
 import auth from './middleware/utils.js'
 
-const App = express();
-App.use(express.json());
+const app = express();
+app.use(express.json());
 
 // Swagger setup
 const swaggerOptions = {
@@ -18,21 +18,38 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'API documentation for the application',
     },
-    servers: [{ url: 'http://localhost:3000' }],
+    servers: [
+      { url: 'http://localhost:3000' }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'apiKey',       // You can also use 'http' with 'bearer' scheme
+          name: 'Authorization',
+          in: 'header',
+          description: 'Enter your token in the format **Bearer &lt;token&gt;**',
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
+    ],
   },
-  apis: ['./controller/*.js', './controller/userController.js'], // Add all relevant files
+  apis: ['./controller/*.js'], // or wherever your route files are located
 };
 
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-App.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
-App.get('/', (req, res) => {
+app.get('/', (req, res) => {
   res.json('Hello there');
 });
-App.use('/article',auth.authenticateJWT, articleRoutes);
-App.use('/login', userRoutes);
+app.use('/article',auth.authenticateJWT, articleRoutes);
+app.use('/login', userRoutes);
 
-App.listen(3000, () => console.log("Server is online at http://localhost:3000"));
+app.listen(3000, () => console.log("Server is online at http://localhost:3000"));
 

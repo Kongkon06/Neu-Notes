@@ -8,6 +8,21 @@ const router = express.Router();
  * /article/create:
  *   post:
  *     summary: Create a new article
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               htmlContent:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Article created
@@ -19,12 +34,27 @@ router.post('/create', createAticle);
  * /article/update/{id}:
  *   put:
  *     summary: Update an article by ID
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               htmlContent:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Article updated
@@ -36,6 +66,8 @@ router.put('/update/:id', updateArticle);
  * /article/{id}:
  *   get:
  *     summary: Get an article by ID
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -53,8 +85,16 @@ router.get('/:id', getArticle);
  * /article/delete:
  *   delete:
  *     summary: Delete an article
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
- *       200:
+ *       204:
  *         description: Article deleted
  */
 router.delete('/delete', deleteArticle);
