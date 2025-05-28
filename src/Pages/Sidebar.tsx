@@ -108,94 +108,23 @@ export function Sidebar() {
           {/* Favorites Section */}
           <div className="px-2 py-1">
             <div
-              className="flex items-center gap-1 p-1 rounded cursor-pointer"
-              onClick={() => toggleSection("favorites")}
+              className="flex items-center p-1 rounded cursor-pointer"
+              onClick={() => navigate('/editor')}
               style={{ color: obsidianColors.sidebarText }}
             >
-              {expandedSections.favorites ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
-              <span className="text-sm font-medium">Favorites</span>
+            <span className="text-md font-medium">Editor</span>
             </div>
-
-            {expandedSections.favorites && (
-              <div className="ml-4">
-                {["Daily journal", "Project ideas", "Reading list"].map(
-                  (item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 p-1 rounded text-sm cursor-pointer hover:bg-opacity-30"
-                      style={{
-                        color: obsidianColors.sidebarText,
-                        backgroundColor:
-                          i === 0 ? obsidianColors.activeBg : "transparent",
-                      }}
-                    >
-                      <Star
-                        size={14}
-                        style={{ color: obsidianColors.favoriteIcon }}
-                      />
-                      {item}
-                    </div>
-                  )
-                )}
-              </div>
-            )}
           </div>
 
           {/* Folders Section */}
           <div className="px-2 py-1">
             <div
               className="flex items-center gap-1 p-1 rounded cursor-pointer"
-              onClick={() => toggleSection("folders")}
+              onClick={() => navigate('/folder')}
               style={{ color: obsidianColors.sidebarText }}
             >
-              {expandedSections.folders ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
-              <span role="button" onClick={()=>navigate('/folder')} className="text-sm font-medium">Folders</span>
+              <span className="text-md font-medium">Folders</span>
             </div>
-
-            {expandedSections.folders && (
-              <div className="ml-4">
-                {folders.map((folder, i) => (
-                  <div
-                    key={i}
-                    className={`flex items-center gap-2 p-1 rounded text-sm cursor-pointer hover:bg-opacity-30 ${
-                      i === 0
-                        ? "bg-[obsidianColors.activeBg]"
-                        : "bg-transparent"
-                    }
-    hover:bg-[obsidianColors.hoverBg] text-[obsidianColors.sidebarText]`}
-                    style={{
-                      color: obsidianColors.sidebarText,
-                      backgroundColor:
-                        i === 0 ? obsidianColors.activeBg : "transparent",
-                    }}
-                  >
-                    <Folder
-                      size={14}
-                      style={{ color: obsidianColors.sidebarIcon }}
-                    />
-                    {folder}
-                  </div>
-                ))}
-                <div
-                  className="flex items-center gap-2 p-1 rounded text-sm cursor-pointer"
-                  style={{ color: obsidianColors.sidebarText }}
-                >
-                  <PlusCircle
-                    size={14}
-                    style={{ color: obsidianColors.sidebarIcon }}
-                  />
-                  New folder
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Tags Section */}

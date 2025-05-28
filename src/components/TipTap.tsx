@@ -2,6 +2,11 @@ import { useEditor, EditorContent, FloatingMenu, BubbleMenu } from '@tiptap/reac
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
+import Highlight from '@tiptap/extension-highlight'
+import { ImageResize } from 'tiptap-extension-resize-image'
+import { useState } from 'react'
+import { generateHTML } from '@tiptap/html'
+import { JSONContent } from '@tiptap/core'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -9,9 +14,14 @@ import {
   DropdownMenuItem,
 } from "../components/ui/dropdown-menu";
 import { Button } from '../components/ui/button'
-import { ImageResize } from 'tiptap-extension-resize-image'
-import { useState } from 'react'
-import Highlight from '@tiptap/extension-highlight';
+
+interface ArticleData {
+  title: string
+  content: JSONContent
+  htmlContent: string
+  createdAt: string
+  updatedAt: string
+}
 
 const Tiptap = ({darkMode} : {darkMode : boolean}) => {
   const obsidianColors = {
@@ -100,17 +110,77 @@ const Tiptap = ({darkMode} : {darkMode : boolean}) => {
     
     setIsSaving(true)
     try {
-      const contentHtml = editor.getHTML()
-      const contentJson = editor.getJSON()
+      // Process images before saving
+      const processedContent = await processImages(editor.getJSON())
       
-      // Replace with your API call
-      console.log('Saving article:', { title, contentHtml, contentJson })
+      // Create article object
+      const article: ArticleData = {
+        title,
+        content: processedContent,
+        htmlContent: generateHTML(processedContent, [
+          StarterKit,
+          Image,
+          TextAlign,
+          Highlight,
+          ImageResize,
+        ]),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+
+      // Save to backend (replace with your API call)
+      const response = await fetch('/api/articles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(article),
+      })
+
+      if (!response.ok) throw new Error('Failed to save article')
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      editor.commands.setContent('<p>Start writing your next article...</p>')
+      setTitle('')
+    } catch (error) {
+      console.error('Save error:', error)
     } finally {
       setIsSaving(false)
     }
+  }
+
+   const uploadImage = async (base64Data: string): Promise<string> => {
+    // Implement your image upload logic here
+    // This example just returns the base64 string, but you should:
+    // 1. Upload to cloud storage or your backend
+    // 2. Return the public URL
+    return base64Data
+  }
+
+  const processImages = async (content: JSONContent): Promise<JSONContent> => {
+    const processNode = async (node: JSONContent): Promise<JSONContent> => {
+      if (node.type === 'image' && node.attrs?.src.startsWith('data:')) {
+        // Upload image and replace base64 with URL
+        const imageUrl = await uploadImage(node.attrs.src)
+        return {
+          ...node,
+          attrs: {
+            ...node.attrs,
+            src: imageUrl,
+          },
+        }
+      }
+      
+      if (node.content) {
+        return {
+          ...node,
+          content: await Promise.all(node.content.map(processNode)),
+        }
+      }
+      
+      return node
+    }
+
+    return await processNode(content)
   }
 
   if (!editor) return null
